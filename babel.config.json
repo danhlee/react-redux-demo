@@ -1,0 +1,6 @@
+{
+  "presets": ["@babel/preset-react"],
+  "plugins": [
+    "@babel/plugin-proposal-class-properties" // allows arrow functions (aka class properties/fields so you don't have to bind regular functions using "this")
+  ]
+}

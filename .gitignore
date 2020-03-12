@@ -1,0 +1,6 @@
+# editor files
+.vscode
+
+# output directories
+node_modules
+dist
