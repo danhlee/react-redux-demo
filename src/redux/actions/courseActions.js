@@ -1,5 +1,6 @@
 import * as types from './actionTypes';
 import * as courseApi from '../../api/courseApi';
+import { beginApiCall, apiCallError } from './apiStatusActions';
 
 /** ACTION CREATOR */
 // course = payload
@@ -9,11 +10,11 @@ export function loadCoursesSuccess(courses) {
 }
 
 export function updateCourseSuccess(course) {
-  return { type: types.UPDATE_COURSE_SUCCESS, course}
+  return { type: types.UPDATE_COURSE_SUCCESS, course };
 }
 
 export function createCourseSuccess(course) {
-  return { type: types.CREATE_COURSE_SUCCESS, course}
+  return { type: types.CREATE_COURSE_SUCCESS, course };
 }
 
 /** THUNKS - Action Creators that return functions (with dispatch as a parameter, but can also take getState as parameter)
@@ -22,12 +23,16 @@ export function createCourseSuccess(course) {
  */
 export function loadCourses() {
   return function(dispatch) {
+    // trigger beginApiCall action before making getCourses() API call
+    dispatch(beginApiCall());
+
     return courseApi
       .getCourses()
       .then(courses => {
         dispatch(loadCoursesSuccess(courses));
       })
       .catch(error => {
+        dispatch(apiCallError(error)); // QUESTION: why pass error to the action creator if it doesn't use it?
         throw error;
       });
   };
@@ -36,14 +41,19 @@ export function loadCourses() {
 // courseApi.saveCourse(course) is an AJAX POST request that returns the (saved course?) response if successful
 export function saveCourse(course) {
   return function(dispatch, getState) {
-    return courseApi.saveCourse(course)
-    .then(savedCourse => {
-      course.id
-        ? dispatch(updateCourseSuccess(savedCourse))
-        : dispatch(createCourseSuccess(savedCourse));
-    })
-    .catch(error => {
-      throw error;
-    });
+    // trigger beginApiCall action before making saveCourse() API call
+    dispatch(beginApiCall());
+
+    return courseApi
+      .saveCourse(course)
+      .then(savedCourse => {
+        course.id
+          ? dispatch(updateCourseSuccess(savedCourse))
+          : dispatch(createCourseSuccess(savedCourse));
+      })
+      .catch(error => {
+        dispatch(apiCallError(error)); // QUESTION: why pass error to the action creator if it doesn't use it?
+        throw error;
+      });
   };
 }

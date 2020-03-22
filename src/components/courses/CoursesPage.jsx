@@ -5,7 +5,8 @@ import * as authorActions from '../../redux/actions/authorActions';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import CourseList from './CourseList';
-import {Redirect} from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
+import Spinner from './../common/Spinner';
 
 class CoursesPage extends Component {
   // using class field instead of constructor
@@ -14,7 +15,7 @@ class CoursesPage extends Component {
   };
 
   componentDidMount() {
-    const { courses, authors, actions } = this.props; //
+    const { courses, authors, actions } = this.props;
 
     // length check on the courses state to only make fetch calls when state is empty
     if (courses.length === 0) {
@@ -36,14 +37,20 @@ class CoursesPage extends Component {
       <>
         {this.state.redirectToAddCoursePage && <Redirect to="/course" />}
         <h3>Courses</h3>
-        <button
-          style={{ marginBottom: 20 }}
-          className="btn btn-primary add-course"
-          onClick={() => this.setState({ redirectToAddCoursePage: true })}
-        >
-          Add Course
-        </button>
-        <CourseList courses={this.props.courses} />
+        {this.props.loading ? (
+          <Spinner />
+        ) : (
+          <>
+            <button
+              style={{ marginBottom: 20 }}
+              className="btn btn-primary add-course"
+              onClick={() => this.setState({ redirectToAddCoursePage: true })}
+            >
+              Add Course
+            </button>
+            <CourseList courses={this.props.courses} />
+          </>
+        )}
       </>
     );
   }
@@ -52,7 +59,8 @@ class CoursesPage extends Component {
 CoursesPage.propTypes = {
   authors: PropTypes.array.isRequired,
   courses: PropTypes.array.isRequired,
-  actions: PropTypes.object.isRequired // actions is an object containing all actionCreators in courseActions.js
+  actions: PropTypes.object.isRequired, // actions is an object containing all actionCreators in courseActions.js
+  loading: PropTypes.bool.isRequired
 };
 
 // ownProps (2nd param) allows us to access any props that are being attached to this component
@@ -68,7 +76,8 @@ function mapStateToProps(state, ownProps) {
               authorName: state.authors.find(a => a.id === course.authorId).name
             };
           }), // return object has convention { propsName: stateName } *stateName is defined in rootReducer
-    authors: state.authors
+    authors: state.authors,
+    loading: state.apiCallsInProgress > 0 // adds a boolean prop to our component that is true if there are any api call in progress according to our counter in the redux store (apiCallsInProgress)
   };
 }
 

@@ -32,7 +32,8 @@
     },
     "import/resolver": { // allows import of non ES6 modules by eslint
       "node": {
-        "paths": ["src"]
+        "extensions": [".js", ".jsx"],
+        "paths": ["./src"]
       }
     }
   },

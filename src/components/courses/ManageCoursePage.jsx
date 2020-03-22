@@ -5,6 +5,8 @@ import { loadCourses, saveCourse } from '../../redux/actions/courseActions'; // 
 import { loadAuthors } from '../../redux/actions/authorActions';
 import { newCourse } from '../../../tools/mockData.js';
 import CourseForm from './CourseForm';
+import Spinner from '../common/Spinner';
+import { toast } from 'react-toastify';
 
 /** Function Component with HOOKS -> allows function components to have state and side-effiects
  *
@@ -30,12 +32,13 @@ function ManageCoursePage({
    */
   const [course, setCourse] = useState({ ...props.course });
   const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
 
   /** useEffect(effectFunction, arrayOfItemsToWatchAndRerun)
    *
    * if arrayOfItemsToWatchAndRerun is empty it will only run once when the component mounts (essentially acting like componentDidMount)
    * if any vars in arrayOfItemsToWatchAndRerun changes/updates, the useEffect() function will fire again
-   * 
+   *
    */
   useEffect(() => {
     // length check on the courses state to only make fetch calls when state is empty
@@ -45,7 +48,7 @@ function ManageCoursePage({
         alert('Loading courses failed' + error);
       });
     } else {
-      setCourse({...props.course});
+      setCourse({ ...props.course });
     }
 
     if (authors.length === 0) {
@@ -70,21 +73,31 @@ function ManageCoursePage({
 
   function handleSave(event) {
     event.preventDefault(); // to prevent page from POSTING BACK
+    setSaving(true); // setSaving to true when save functionality is invoked (no need to set to false after because we are redirecting to different page and component will unmount)
 
     // this is the locally scoped destructured variable NOT the imported actionCreator (saveCourse is actually a thunk)
-    saveCourse(course).then(() => {
-      history.push('/courses');
-    });
+    saveCourse(course)
+      .then(() => {
+        toast.success('Course saved.');
+        history.push('/courses');
+      })
+      .catch(error => {
+        setSaving(false);
+        setErrors({ onSave: error.message });
+      });
   }
 
   /** Function component doesn't have a render and instead just uses a return statement */
-  return (
+  return authors.length === 0 || courses.length === 0 ? (
+    <Spinner />
+  ) : (
     <CourseForm
       course={course}
       errors={errors}
       authors={authors}
       onChange={handleChange}
       onSave={handleSave}
+      saving={saving}
     />
   );
 }
@@ -115,7 +128,7 @@ function mapStateToProps(state, ownProps) {
   // read course slug from url
   const slug = ownProps.match.params.slug;
   const course =
-    slug && state.courses.length > 0            // ensures that the ajax call to load courses is completed and state.courses is not empty before searching through them
+    slug && state.courses.length > 0 // ensures that the ajax call to load courses is completed and state.courses is not empty before searching through them
       ? getCourseBySlug(state.courses, slug)
       : newCourse;
   // don't share the ENTIRE store's state with each component, else this component will rerender EVERY TIME any variable in the store is changed!
@@ -131,7 +144,8 @@ function mapStateToProps(state, ownProps) {
  * each property in object is a ref to a acton-creator { propRef: actionCreator }
  * dispatch is automatically injected into each action-creator!!
  * { propsVarName: importedActionCreatorWrappedInDispatch }
- *
+ *import Spinner from './../common/Spinner';
+
  */
 const mapDispatchToProps = {
   loadCourses: loadCourses,

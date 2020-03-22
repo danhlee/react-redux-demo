@@ -2,7 +2,7 @@
   "courses": [
     {
       "id": 1,
-      "title": "Securing React Apps with Auth0 and SQUALOR",
+      "title": "",
       "slug": "react-auth0-authentication-security",
       "authorId": 1,
       "category": "JavaScript"
