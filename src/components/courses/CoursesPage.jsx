@@ -1,51 +1,56 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as courseActions from '../../redux/actions/courseActions';
+import * as authorActions from '../../redux/actions/authorActions';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
+import CourseList from './CourseList';
+import {Redirect} from 'react-router-dom';
 
 class CoursesPage extends Component {
-  // NEW WAY (class properties means no more "this" keyword, "this" is auto tied to component's instance)
+  // using class field instead of constructor
   state = {
-    course: {
-      title: ''
+    redirectToAddCoursePage: false
+  };
+
+  componentDidMount() {
+    const { courses, authors, actions } = this.props; //
+
+    // length check on the courses state to only make fetch calls when state is empty
+    if (courses.length === 0) {
+      // this.props.actions.loadCourses() is a thunk that can THROW an error (so it must be handled when called)
+      actions.loadCourses().catch(error => {
+        alert('Loading courses failed' + error);
+      });
     }
-  };
 
-  handleChange = event => {
-    const course = { ...this.state.course, title: event.target.value };
-
-    this.setState({ course }); // object shorthand syntax (ie - same as this.setState({course: course}) )
-  };
-
-  handleSubmit = event => {
-    event.preventDefault();
-
-    // using auto-injected dispatch() prop function to dispatch CREATE_COURSE action
-    this.props.actions.createCourse(this.state.course);
-  };
+    if (authors.length === 0) {
+      actions.loadAuthors().catch(error => {
+        alert('Loading authors failed' + error);
+      });
+    }
+  }
 
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
-        {/** using onSubmit property on form allows submission via enter key as well as on clicking button (use this rather than onClick on submit button) */}
+      <>
+        {this.state.redirectToAddCoursePage && <Redirect to="/course" />}
         <h3>Courses</h3>
-        <h3>Add Course</h3>
-        <input
-          type="text"
-          onChange={this.handleChange}
-          value={this.state.course.title}
-        />
-        <input type="submit" value="Save" />
-        {this.props.courses.map(course => (
-          <div key={course.title}>{course.title}</div>
-        ))}
-      </form>
+        <button
+          style={{ marginBottom: 20 }}
+          className="btn btn-primary add-course"
+          onClick={() => this.setState({ redirectToAddCoursePage: true })}
+        >
+          Add Course
+        </button>
+        <CourseList courses={this.props.courses} />
+      </>
     );
   }
 }
 
 CoursesPage.propTypes = {
+  authors: PropTypes.array.isRequired,
   courses: PropTypes.array.isRequired,
   actions: PropTypes.object.isRequired // actions is an object containing all actionCreators in courseActions.js
 };
@@ -54,19 +59,30 @@ CoursesPage.propTypes = {
 function mapStateToProps(state, ownProps) {
   // don't share the ENTIRE store's state with each component, else this component will rerender EVERY TIME any variable in the store is changed!
   return {
-    courses: state.courses
+    courses:
+      state.authors.length === 0 // authors are fetched async, so need to check if available first, IF NOT pass back empty array
+        ? []
+        : state.courses.map(course => {
+            return {
+              ...course,
+              authorName: state.authors.find(a => a.id === course.authorId).name
+            };
+          }), // return object has convention { propsName: stateName } *stateName is defined in rootReducer
+    authors: state.authors
   };
 }
 
 function mapDispatchToProps(dispatch) {
   // createCouse will be available as this.props.createCourse when returned
-  // bindActionCreators() can accept 1 function (action-creator) or 1 object (a bundle of action-creators) as the 1st param 
+  // bindActionCreators() can accept 1 function (action-creator) or 1 object (a bundle of action-creators) as the 1st param
   // and wrap them in the dispatch() function (which is the 2nd param)
   return {
-    actions: bindActionCreators(courseActions, dispatch)
+    actions: {
+      loadCourses: bindActionCreators(courseActions.loadCourses, dispatch),
+      loadAuthors: bindActionCreators(authorActions.loadAuthors, dispatch)
+    }
   };
 }
-
 
 /**
  * mapStateToProps -> controls which state variables are exposed to our component

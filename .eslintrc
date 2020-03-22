@@ -1,9 +1,8 @@
 {
   "extends": [
-    // "netflix",
     "eslint:recommended",
     "plugin:react/recommended",
-    // "plugin:import/errors",
+    "plugin:import/errors",
     "plugin:import/warnings"
   ],
   "parser": "babel-eslint",
@@ -24,11 +23,17 @@
     "no-debugger": "off",
     "no-console": "off",
     "no-unused-vars": "warn",
-    "react/prop-types": "warn"
+    "react/prop-types": "warn",
+    "no-undefined": "error"
   },
   "settings": {
     "react": {
       "version": "detect"
+    },
+    "import/resolver": { // allows import of non ES6 modules by eslint
+      "node": {
+        "paths": ["src"]
+      }
     }
   },
   "root": true
