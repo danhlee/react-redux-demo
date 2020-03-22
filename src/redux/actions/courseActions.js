@@ -17,6 +17,10 @@ export function createCourseSuccess(course) {
   return { type: types.CREATE_COURSE_SUCCESS, course };
 }
 
+export function deleteCourseOptimistic(course) {
+  return { type: types.DELETE_COURSE_OPTIMISTIC, course };
+}
+
 /** THUNKS - Action Creators that return functions (with dispatch as a parameter, but can also take getState as parameter)
  * dispatch param is injected into thunks automatically by redux-thunk (ie - not needed as param for loadCourses())
  *
@@ -55,5 +59,13 @@ export function saveCourse(course) {
         dispatch(apiCallError(error)); // QUESTION: why pass error to the action creator if it doesn't use it?
         throw error;
       });
+  };
+}
+
+export function deleteCourse(course) {
+  return function(dispatch) {
+    // Doing optimistic delete, so not dispatching beginApiCall() or apiCallError() since we're not showing loading status
+    dispatch(deleteCourseOptimistic(course));
+    return courseApi.deleteCourse(course.id);
   };
 }

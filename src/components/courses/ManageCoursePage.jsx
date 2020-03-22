@@ -71,8 +71,26 @@ function ManageCoursePage({
     }));
   }
 
+  /** Client-side form validation */
+  function formIsValid() {
+    const {title, authorId, category} = course;
+    const errors = {};
+    if (!title) errors.title = "Title is Required.";
+    if (!authorId) errors.author = "Author is Required.";
+    if (!category) errors.category = "Category is Required.";
+    setErrors(errors);
+    
+    // Form is valid if the erros object still has no properties
+    // Object.key(object) returns an array containing all the keys within the object (not their values), returns empty array if object has no properties
+    return Object.keys(errors).length === 0;
+  }
+
   function handleSave(event) {
     event.preventDefault(); // to prevent page from POSTING BACK
+    
+    // validate form on hitting save button (if invalid just return early)
+    if (!formIsValid()) return;
+
     setSaving(true); // setSaving to true when save functionality is invoked (no need to set to false after because we are redirecting to different page and component will unmount)
 
     // this is the locally scoped destructured variable NOT the imported actionCreator (saveCourse is actually a thunk)
