@@ -32,12 +32,29 @@ class CoursesPage extends Component {
       });
     }
   }
-
+  
+  /** PROMISE-BASED 
   handleDeleteCourse = course => {
     toast.success('Course deleted.');
     this.props.actions.deleteCourse(course).catch(error => {
       toast.error('Delete failed. ' + error.message, { autoClose: false });
     });
+  };
+  */
+
+  /** ASYNC/AWAIT-BASED 
+   * 
+   * still uses promises behind the scenes
+   * function after await returns a promise
+   */
+  handleDeleteCourse = async course => {
+    toast.success('Course deleted.');
+
+    try {
+      await this.props.actions.deleteCourse(course);
+    } catch(error) {
+      toast.error('Delete failed. ' + error.message, { autoClose: false });
+    }
   };
 
   render() {

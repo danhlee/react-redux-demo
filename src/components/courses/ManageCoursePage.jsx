@@ -13,9 +13,13 @@ import { toast } from 'react-toastify';
  * props can be destructured in the signature area of the function component
  * ...props at the end holds any remaining props that haven't been destructured in signature (...props is a REST operator, which looks EXACTLY the same as a SPREAD operator)
  * props that are not destructured will be accessed via props.varName
+ * 
+ * adding export to component for Enzyme testing
+ * - this component now exports 2 things (connected and unconnected ver of component)
+ * - connected version is the DEFAULT export
  *
  */
-function ManageCoursePage({
+export function ManageCoursePage({
   courses,
   authors,
   loadCourses,

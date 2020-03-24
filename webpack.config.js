@@ -34,12 +34,12 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      "process.env.API_URL": JSON.stringify('http://localhost:3001')
+      'process.env.API_URL': JSON.stringify('http://localhost:3001')
     }),
     new HtmlWebpackPlugin({
       favicon: './src/favicon2.ico',
       template: 'src/index.html'
-    }),
+    })
     // new MiniCssExtractPlugin({
     //   filename: 'css/[name].css'
     // })
