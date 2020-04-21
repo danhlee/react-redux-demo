@@ -7,7 +7,7 @@ export default function configureStore(initialState) {
   const composeEnhancers =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose; // adds support for redux dev tools
 
-  // NORMAL WAY: createStore(rootReducer(), initialState, applyMiddleware())
+  // NORMAL WAY: createStore(rootReducer, initialState, applyMiddleware())
 
   // USING REDUX_DEVTOOLS WAY
   return createStore(

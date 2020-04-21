@@ -166,7 +166,7 @@ function mapStateToProps(state, ownProps) {
  * each property in object is a ref to a acton-creator { propRef: actionCreator }
  * dispatch is automatically injected into each action-creator!!
  * { propsVarName: importedActionCreatorWrappedInDispatch }
- *import Spinner from './../common/Spinner';
+ *
 
  */
 const mapDispatchToProps = {
