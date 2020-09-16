@@ -1,5 +1,7 @@
 export default {
   authors: [],
   courses: [],
-  apiCallsInProgress: 0
+  apiCallsInProgress: 0,
+  name: 'default name',
+  school: 'default school'
 }

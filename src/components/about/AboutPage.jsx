@@ -1,12 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { connect } from 'react-redux';
+import SchoolComponent from './SchoolComponent';
+import { changeName } from '../../redux/actions/testGlobalAction';
 
-const AboutPage = () => {
+const AboutPage = (props) => {
+
+  const [stateVarCalledName, setNewNameValue] = useState('');
+
+
+  function handleChange(e) {
+    setNewNameValue(e.target.value);
+  }
+
+  function changeNameHandler() {
+    props.changeNameAction(stateVarCalledName);
+  }
+
+  console.log('[NAME] COMPONENT RENDERED!');
   return (
-    <div>
+    <>
       <h2>About</h2>
       <p>This app uses React, React Router, and other helpful libraries</p>
-    </div>
+      <p>name: {props.myName}</p>
+      <p>school: {props.mySchool}</p>
+      <input value={stateVarCalledName} onChange={handleChange} />
+      <button onClick={changeNameHandler}>Change Name</button>
+      <SchoolComponent />
+    </>
   );
 };
 
-export default AboutPage;
+
+function mapStateToProps(state) {
+  return {
+    myName: state.testReducer.name,
+    mySchool: state.testReducer.school
+  };
+}
+
+const mapDispatchToProps = {
+  changeNameAction: changeName
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(AboutPage);
